@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crossword</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        li.value {
+            font-weight: bold;
+        }
+
+        .button-input {
+            background-color: white;
+            border: none;
+            text-align: center;
+            width: 20px;
+            height: 20px;
+        }
+
+        hr {
+            margin: 40px auto;
+            width: 80%;
+            height: 3px;
+            background-color: black;
+            border: none;
+        }
+
+        .hints-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .hints-across,
+        .hints-down {
+            float: left;
+            margin: 0 30px;
+            line-height: 30px;
+            font-size: 15px;
+        }
+
+        p {
+            font-size: 20px;
+            color: black;
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 40px auto;
+        }
+
+        td {
+            border: 1px solid black;
+            width: 20px;
+            height: 20px;
+        }
+
+        .hidden {
+            border: none;
+            outline: none;
+            width: 20px;
+            height: 20px;
+            cursor: none;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        input[type="submit"],
+        input[type="reset"],
+        input[type="button"] {
+            background: grey;
+            border-radius: 30px;
+            border: none;
+            padding: 10px 30px;
+            font-size: 15px;
+        }
+
+        .popup {
+            /* margin-top: 10px; */
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: top 0.3s, left 0.3s;
+            border-radius: 20px;
+            text-align: left;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .popup p {
+            font-family: "Roboto", sans-serif;
+            font-weight: 300;
+            font-size: 14px;
+            margin-top: 14px;
+            margin-left: 30px;
+            text-align: left;
+        }
+
+        .popup>div {
+            font-size: 24px;
+            font-family: "Oswald";
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body ng-app="myApp">
+    <form ng-submit="getScore();">
+        <table>
+            <tr>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" placeholder="▸5" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" placeholder="▾3" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td><input class="button-input" type="text" maxlength="1" placeholder="▾1" /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td><input class="button-input" type="text" maxlength="1" placeholder="▸4" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+            <tr>
+                <td class="hidden"><input class="button-input" type="text" maxlength="1" disabled /></td>
+                <td><input class="button-input" type="text" maxlength="1" placeholder="▸2" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+                <td><input class="button-input" type="text" maxlength="1" /></td>
+            </tr>
+        </table>
+        <div class="button-container" ng-controller="myController">
+            <input type="button" name="hint" id="hint" value="Hint" ng-click="showHint()">
+            <input type="reset" name="reset" id="reset">
+            <input type="submit" name="submit" id="submit" ng-click="getScore()">
+            <input type="submit" name="Answers" id="submit" ng-click="showAnswers()" value="Answers">
+        </div>
+    </form>
+
+    <p>Score: <span id="score">0</span></p>
+    <hr />
+
+    <div class="hints-container">
+        <div class="hints-across">
+            <p><strong>Across</strong></p>
+            <ol>
+                <li value="2"><span>A feline furry animal (3 letters)</span></li>
+                <li value="4"><span>The ability to understand and share the feelings of another (7 letters)</span></li>
+                <li value="5"><span>A small brown bird which is known for chirping (6 letters)</span></li>
+            </ol>
+        </div>
+
+        <div class="hints-down">
+            <p><strong>Down</strong></p>
+            <ol>
+                <li value="1"><span>A large, four-legged animal that is often used for transportation (5 letters)</span>
+                </li>
+                <li value="3"><span>Existing or available in large quantities (8 letters)</span></li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Popup Answers -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <div id="popup-content">
+        </div>
+    </div>
+
+    <script>
+        const hints = {
+            across: {
+                2: "Purr-fect companion.",
+                4: "Putting oneself in another's shoes.",
+                5: "Tweeting songbird."
+            },
+            down: {
+                1: "Galloping creature.",
+                3: "Overflowing with plenty."
+            }
+        };
+
+        angular.module('myApp', [])
+            .controller('myController', function ($scope) {
+                $scope.showHint = () => {
+                    let formattedText = '<h2>Answers:</h2>';
+                    const popupContent = document.getElementById("popup-content");
+                    Object.keys(hints).forEach(direction => {
+                        formattedText += `<h3>${direction.charAt(0).toUpperCase() + direction.slice(1)}:</h3>`;
+                        Object.entries(hints[direction]).forEach(([number, word]) => {
+                            formattedText += `<p>${number}. ${word}</p>`;
+                        });
+                    });
+                    popupContent.innerHTML = formattedText;
+                    overlay.style.display = "block";
+                    popup.style.display = "block";
+                    overlay.addEventListener("click", () => {
+                        hidePopup(popup, overlay);
+                        function hidePopup(popup, overlay) {
+                            popup.style.display = "none";
+                            overlay.style.display = "none";
+                        }
+                    });
+
+                };
+
+                $scope.getScore = () => {
+                    var inputs = document.querySelectorAll('.button-input:not([disabled])');
+                    var correctCount = 0;
+                    var answerPattern = "sparrowhbournsdempathyncat";
+                    for (let i = 0; i < answerPattern.length; i++) {
+                        if (inputs[i].value.toLowerCase() == answerPattern[i]) {
+                            correctCount++;
+                        }
+                    }
+                    document.getElementById('score').innerText = correctCount;
+                }
+
+                $scope.showAnswers = () => {
+                    var inputs = document.querySelectorAll('.button-input:not([disabled])');
+                    var correctCount = 0;
+                    var answerPattern = "sparrowhbournsdempathyncat".toLocaleUpperCase();
+                    for (let i = 0; i < answerPattern.length; i++) {
+                        inputs[i].value = answerPattern[i];
+                    }
+                }
+
+            });
+        
+            var inputs = document.querySelectorAll('.button-input');
+
+        // Event Listener
+        inputs.forEach(function (input, index) {
+            input.addEventListener('input', function (event) {
+                var value = input.value;
+                inputs[index + 1].focus();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
